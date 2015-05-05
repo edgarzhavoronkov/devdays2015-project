@@ -27,7 +27,7 @@ int headTarget;
 void MoveLeftHand()
 {
   if (leftHandCurrent == leftHandTarget)
-    break;
+    return;
     
   int dx = 1;
   
@@ -42,7 +42,7 @@ void MoveLeftHand()
 void MoveRightHand()
 {
   if (rightHandCurrent == rightHandTarget)
-    break;
+    return;
     
   int dx = 1;
   
@@ -57,7 +57,7 @@ void MoveRightHand()
 void MoveHead()
 {
   if (headCurrent == headTarget)
-    break;
+    return;
     
   int dx = 1;
   
@@ -74,18 +74,18 @@ void Parse()
   int command = 0;
   int angle = 0;
   
-  if (Serial.avaliable() > 0)
+  if (Serial.available() > 0)
   {
-    command = Serial.read()
+    command = Serial.parseInt();
   } else
   {
-    break;
+    return;
   }
   
   //need to read one more parameter
   if (command == COMMAND_MOVE_LH || command == COMMAND_MOVE_RH || command == COMMAND_MOVE_HEAD)
   {
-    angle = Serial.read();
+    angle = Serial.parseInt();
   }
   
   if (command == COMMAND_MOVE_LH)
@@ -109,7 +109,7 @@ void setup()
   
   leftHandCurrent = leftHandTarget = 0;
   rightHandCurrent = rightHandTarget = 0;
-  headCurrent = headHandTarget = 0;
+  headCurrent = headTarget = 0;
 } 
  
  
