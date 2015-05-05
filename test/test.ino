@@ -31,9 +31,9 @@ int blinkFlag1;
 int blinkFlag2;
 
 int counter = 0;
-int state = 0;
+int state = 1;
 
-const int MAX_VALUE = 1000;
+const int MAX_VALUE = 20;
 
 void BlinkOn()
 {
@@ -121,14 +121,32 @@ void Parse()
   int command = 0;
   int angle = 0;
   
+  String curStr;
+  
   if (Serial.available() > 0)
   {
-    command = Serial.parseInt();
+    curStr = (String)Serial.readStringUntil('\n');
+    command = curStr[0] - '0';
+    //command = Serial.parseInt();
     //need to read one more parameter
+    //Serial.write("Y");
     if (command == COMMAND_MOVE_RH || command == COMMAND_MOVE_LH || command == COMMAND_MOVE_HEAD)
     {
-      angle = Serial.parseInt();
+      String newStr;
+      int i = 2;
+      while (curStr[i] != 0)
+        newStr += curStr[i++];
+        
+      newStr[i] = 0;
+      
+      angle = newStr.toInt();
+      //Serial.read();
+      //angle = Serial.parseInt();
+      //Serial.write("X");
     }
+    
+    //Serial.readString();
+    
   } else
   {
     return;
@@ -145,6 +163,7 @@ void Parse()
     headTarget = angle;
   } else if (command == COMMAND_BLINK_ON)
   {
+    state = 1;
     blinkFlag1 = 1;
     blinkFlag2 = 0;
   } else if (command == COMMAND_EYES_ON)
