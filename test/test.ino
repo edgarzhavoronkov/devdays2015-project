@@ -77,15 +77,14 @@ void Parse()
   if (Serial.available() > 0)
   {
     command = Serial.parseInt();
+    //need to read one more parameter
+    if (command == COMMAND_MOVE_RH || command == COMMAND_MOVE_LH || command == COMMAND_MOVE_HEAD)
+    {
+      angle = Serial.parseInt();
+    }
   } else
   {
     return;
-  }
-  
-  //need to read one more parameter
-  if (command == COMMAND_MOVE_LH || command == COMMAND_MOVE_RH || command == COMMAND_MOVE_HEAD)
-  {
-    angle = Serial.parseInt();
   }
   
   if (command == COMMAND_MOVE_LH)
@@ -103,6 +102,7 @@ void Parse()
  
 void setup() 
 { 
+  Serial.begin(57600);
   HeadServo.attach(HeadServoPin);
   LeftHandServo.attach(LeftHandServoPin);
   RightHandServo.attach(RightHandServoPin);
@@ -110,16 +110,18 @@ void setup()
   leftHandCurrent = leftHandTarget = 0;
   rightHandCurrent = rightHandTarget = 0;
   headCurrent = headTarget = 0;
+  LeftHandServo.write(1);
+  RightHandServo.write(1);
+  HeadServo.write(1);
 } 
  
  
 void loop() 
-{ 
-  Serial.begin(9600); 
-
+{  
   Parse();
 
   MoveHead();
   MoveLeftHand();
-  MoveRightHand();  
+  MoveRightHand();
+  delay(10);  
 } 
