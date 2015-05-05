@@ -30,15 +30,26 @@ int headTarget;
 int blinkFlag1;
 int blinkFlag2;
 
+int counter = 0;
+int state = 0;
+
+const int MAX_VALUE = 1000;
+
 void BlinkOn()
 {
   if (blinkFlag1 != blinkFlag2)
   {
-    digitalWrite(LeftEyePin, HIGH);
-    digitalWrite(RightEyePin, HIGH);
-    delay(100);
-    digitalWrite(LeftEyePin, LOW);
-    digitalWrite(RightEyePin, LOW);
+    if (counter <= MAX_VALUE)
+    {
+      digitalWrite(LeftEyePin, state);
+      digitalWrite(RightEyePin, state);
+      counter += 1;
+    }
+    else
+    {
+      state = !state;
+      counter = 0;  
+    }
   }  
 }
 
@@ -132,15 +143,15 @@ void Parse()
   } else if (command == COMMAND_MOVE_HEAD)
   {
     headTarget = angle;
-  } else if (command == COMMNAND_BLINK_ON)
+  } else if (command == COMMAND_BLINK_ON)
   {
     blinkFlag1 = 1;
     blinkFlag2 = 0;
-  } else if (command == COMMNAND_EYES_ON)
+  } else if (command == COMMAND_EYES_ON)
   {
     blinkFlag1 = 1;
     blinkFlag2 = 1;
-  } else if (command == COMMNAND_EYES_OFF)
+  } else if (command == COMMAND_EYES_OFF)
   {
     blinkFlag1 = 0;
     blinkFlag2 = 0;
@@ -155,7 +166,7 @@ void setup()
   RightHandServo.attach(RightHandServoPin);
   
   pinMode(LeftEyePin, OUTPUT);
-  pinMode(RightEyePin, OUTPUT;
+  pinMode(RightEyePin, OUTPUT);
   
   leftHandCurrent = leftHandTarget = 0;
   rightHandCurrent = rightHandTarget = 0;
