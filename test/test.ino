@@ -218,7 +218,7 @@ void Parse()
     leftHandTarget = angle;
   } else if (command == COMMAND_MOVE_RH)
   {
-    rightHandTarget = angle;
+    rightHandTarget = 160 - angle;
   } else if (command == COMMAND_MOVE_HEAD)
   {
     headTarget = angle;
@@ -254,10 +254,10 @@ void setup()
   leftHandCurrent = leftHandTarget = 0;
   rightHandCurrent = rightHandTarget = 0;
   headCurrent = headTarget = 0;
-  goTarget = goCurrent = 0;
+  goTarget = goCurrent = 90;
   LeftHandServo.write(1);
-  RightHandServo.write(1);
-  HeadServo.write(1);
+  RightHandServo.write(160);
+  HeadServo.write(90);
 }
  
  
