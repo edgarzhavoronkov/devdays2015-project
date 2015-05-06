@@ -6,6 +6,8 @@ const int COMMAND_EYES_OFF = 3;
 const int COMMAND_MOVE_LH = 4;
 const int COMMAND_MOVE_RH = 5;
 const int COMMAND_MOVE_HEAD = 6;
+const int COMMAND_GO = 7;
+const int COMMAND_STOP = 8;
 
 Servo HeadServo;
 Servo LeftHandServo;
@@ -18,6 +20,11 @@ int RightHandServoPin = 11;
 int LeftEyePin = 12;
 int RightEyePin = 13;
 
+int LeftWheelPlus = 3;
+int LeftWheelMinus = 4;
+int RightWheelPlus = 5;
+int RightWheelMinus = 6;
+
 int leftHandCurrent;
 int leftHandTarget;
 
@@ -29,6 +36,9 @@ int headTarget;
 
 int blinkFlag1;
 int blinkFlag2;
+
+int goCurrent;
+int goTarget;
 
 int counter = 0;
 int state = 1;
@@ -116,10 +126,50 @@ void MoveHead()
   HeadServo.write(headCurrent);
 }
 
+void goOn()
+{
+  if (goCurrent == goTarget)
+  {
+   goOff();
+   return;
+  }
+ 
+  if (goCurrent > goTarget)
+  {
+    goCurrent -= 1;
+    
+    digitalWrite(LeftWheelPlus, LOW);
+    digitalWrite(LeftWheelMinus, HIGH);
+  
+    digitalWrite(RightWheelPlus, LOW);
+    digitalWrite(RightWheelMinus, HIGH);
+    
+  } else
+  {
+    goCurrent += 1;
+    
+    digitalWrite(LeftWheelPlus, HIGH);
+    digitalWrite(LeftWheelMinus, LOW);
+  
+    digitalWrite(RightWheelPlus, HIGH);
+    digitalWrite(RightWheelMinus, LOW);
+  }
+}
+
+void goOff()
+{
+  digitalWrite(LeftWheelPlus, LOW);
+  digitalWrite(LeftWheelMinus, LOW);
+  
+  digitalWrite(RightWheelPlus, LOW);
+  digitalWrite(RightWheelMinus, LOW);
+}
+
 void Parse()
 {
   int command = 0;
   int angle = 0;
+  int distance = 0;
   
   String curStr;
   
@@ -127,9 +177,7 @@ void Parse()
   {
     curStr = (String)Serial.readStringUntil('\n');
     command = curStr[0] - '0';
-    //command = Serial.parseInt();
-    //need to read one more parameter
-    //Serial.write("Y");
+
     if (command == COMMAND_MOVE_RH || command == COMMAND_MOVE_LH || command == COMMAND_MOVE_HEAD)
     {
       String newStr;
@@ -140,16 +188,29 @@ void Parse()
       newStr[i] = 0;
       
       angle = newStr.toInt();
-      //Serial.read();
-      //angle = Serial.parseInt();
-      //Serial.write("X");
+    } else if (command == COMMAND_GO)
+    {
+      String newStr;
+      int i = 2;
+      while (curStr[i] != 0)
+        newStr += curStr[i++];
+        
+      newStr[i] = 0;
+      
+      distance = newStr.toInt();
     }
-    
-    //Serial.readString();
     
   } else
   {
     return;
+  }
+  
+  if (angle <= 0)
+  {
+    angle = 1;
+  } else if (angle > 160)
+  {
+    angle = 160;
   }
   
   if (command == COMMAND_MOVE_LH)
@@ -174,7 +235,10 @@ void Parse()
   {
     blinkFlag1 = 0;
     blinkFlag2 = 0;
-  }    
+  } else if (command == COMMAND_GO)
+  {
+    goTarget = distance;
+  }
 }
  
 void setup() 
@@ -190,10 +254,11 @@ void setup()
   leftHandCurrent = leftHandTarget = 0;
   rightHandCurrent = rightHandTarget = 0;
   headCurrent = headTarget = 0;
+  goTarget = goCurrent = 0;
   LeftHandServo.write(1);
   RightHandServo.write(1);
   HeadServo.write(1);
-} 
+}
  
  
 void loop() 
@@ -206,5 +271,7 @@ void loop()
   BlinkOn();
   EyesOn();
   EyesOff();
+  goOn();
+  
   delay(10);  
 } 
