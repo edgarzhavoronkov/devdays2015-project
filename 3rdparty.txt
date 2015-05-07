@@ -1,0 +1,2 @@
+Third party soft we used
+1. Servo library for Arduino - http://www.arduino.cc/en/Reference/Servo
